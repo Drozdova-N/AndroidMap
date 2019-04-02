@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">navigator</string>
+    <string name="app_name">Navigator</string>
+    <string name ="pointA">A: </string>
+    <string name ="pointB">B: </string>
+    <string name="btn_go">GO</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
