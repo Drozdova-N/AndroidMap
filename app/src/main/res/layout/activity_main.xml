@@ -9,7 +9,7 @@
     android:gravity="top"
     sothhree:panelHeight="30dp">
 
-
+    <!--R.drawable.ic_group_collapse_08-->
     <fragment
         android:id="@+id/map_View"
         android:name="com.google.android.gms.maps.SupportMapFragment"
