@@ -2,14 +2,11 @@
 
 <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:sothhree="http://schemas.android.com/apk/res-auto"
-
     android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="top"
     sothhree:panelHeight="30dp">
-
-    <!--R.drawable.ic_group_collapse_08-->
     <fragment
         android:id="@+id/map_View"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -20,11 +17,10 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true" />
 
-<include
-     layout="@layout/nav_header_main"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    />
+    <include
+        layout="@layout/nav_header_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

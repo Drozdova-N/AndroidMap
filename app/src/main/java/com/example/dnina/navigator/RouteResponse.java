@@ -6,11 +6,12 @@ public class RouteResponse {
      List<Route> routes;
 
     public String getPoints() {
-        return this.routes.get(0).overviewPolyline.points;
+        return this.routes.get(0).overview_polyline.points;
     }
 
     class Route {
-         OverviewPolyline overviewPolyline;
+         OverviewPolyline overview_polyline;
+
     }
 
     class OverviewPolyline {

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -30,6 +31,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -47,15 +49,21 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleMap map;
     private Button btnGO;
+    private EditText destination;
+    private EditText origin;
+    private SlidingUpPanelLayout slidingPanel;
+    private ImageView upArrow;
+    private ImageView downArrow;
+
+
     private static final String MYTAG = "MAIN_ACTIVITY";
     private static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
-    private EditText destination;
-    private EditText origin;
-    private LocationUser locationUser;
 
+    private LocationUser locationUser;
     private Location currentLocation;
     private String ssss = "59.999451,30.366708";
+    private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,28 +72,62 @@ public class MainActivity extends AppCompatActivity {
 
         origin = findViewById(R.id.origin);
         destination = findViewById(R.id.destination);
-//        if (currentLocation != null) origin.setText(getLocationStr(currentLocation));
-        destination.setText(ssss);
         btnGO = findViewById(R.id.btn_GO);
+        slidingPanel = findViewById(R.id.sliding_layout);
+        upArrow = findViewById(R.id.up_arrow);
+        downArrow = findViewById(R.id.down_arrow);
+
+        destination.setText(ssss);
 
         // отрисовка карты
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_View);
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_View);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 map = googleMap;
+                mapView = new MapView(map);
                 showLocationUser();
                 if (currentLocation != null) origin.setText(getLocationStr(currentLocation));
+
             }
         });
-
 
         btnGO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (origin.getText() != null && destination != null) {
                     showRoute();
+                    slidingPanel.collapsePanel();
                 }
+                
+            }
+        });
+
+
+        slidingPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float v) {
+                upArrow.setVisibility(View.VISIBLE);
+                downArrow.setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onPanelCollapsed(View view) {
+                downArrow.setVisibility(View.VISIBLE);
+                upArrow.setVisibility(View.INVISIBLE);
+
+            }
+
+            @Override
+            public void onPanelExpanded(View view) {
+            }
+
+            @Override
+            public void onPanelAnchored(View view) {
+            }
+
+            @Override
+            public void onPanelHidden(View view) {
             }
         });
     }
@@ -94,54 +136,20 @@ public class MainActivity extends AppCompatActivity {
         return "" + ll.getLatitude() + "," + ll.getLongitude();
     }
 
-    private void showRoute() {
-        String baseURL = "https://maps.googleapis.com/";
+    private void showRoute(String origin , String destination) {
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS);
-
-        Retrofit.Builder retrofitBuilder = new Retrofit.Builder().baseUrl(baseURL)
-                .client(httpClient.build())
-                .addConverterFactory(GsonConverterFactory.create());
-        Retrofit retrofit = retrofitBuilder.build();
-
-        final RouteRequest request = retrofit.create(RouteRequest.class);
-        Call<RouteResponse> call =request.getRout(origin.getText().toString(),
-                destination.getText().toString(),
-                true,
-                "ru" ,"transit");
-
-
-
-
+        RouteRequest request = NetworkModule.getRouteRequest();
+        Call<RouteResponse> call = request.getRout(origin,
+                destination,
+                true, "ru");
         call.enqueue(new Callback<RouteResponse>() {
             @Override
             public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
                 RouteResponse route = response.body();
-                List<LatLng> listLL = PolyUtil.decode(response.body().getPoints());
-                PolylineOptions polyline = new PolylineOptions();
-                polyline.width(4f).color(Color.red(2));
-                LatLngBounds.Builder llBounds = new LatLngBounds.Builder();
-
-                for (int i = 1; i < listLL.size() - 1; i++) {
-
-                    polyline.add(listLL.get(i));
-                    llBounds.include(listLL.get(i));
-                }
-
-                MarkerOptions start = new MarkerOptions().position(listLL.get(1)).title("A");
-                MarkerOptions finish = new MarkerOptions().position(listLL.get(listLL.size() - 1)).title("B");
-                map.addMarker(start);
-                map.addMarker(finish);
-                map.addPolyline(polyline);
-                int sizeRoute = getResources().getDisplayMetrics().widthPixels;
-                LatLngBounds latLngBounds = llBounds.build();
-                CameraUpdate track = CameraUpdateFactory.newLatLngBounds(latLngBounds , sizeRoute , sizeRoute , 25) ;
-                map.moveCamera(track);
+                List<LatLng> listLL = PolyUtil.decode(route.getPoints());
+                mapView.drawRoute(listLL, getResources().getDisplayMetrics().widthPixels);
 
             }
-
 
             @Override
             public void onFailure(Call<RouteResponse> call, Throwable t) {
@@ -157,29 +165,9 @@ public class MainActivity extends AppCompatActivity {
         currentLocation = locationUser.getLocation();
 
         if (currentLocation != null) {
+
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(latLng)             // Sets the center of the map to location user
-                    .zoom(15)                   // Sets the zoom
-                    .bearing(360)                // Sets the orientation of the camera to north
-                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                    .build();                   // Creates a CameraPosition from the builder
-            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-
-            // Add Marker to Map
-            MarkerOptions option = new MarkerOptions();
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.cat2);
-            //   option.setIcon(bitmapDescriptor);
-            option.title("My Location");
-            option.snippet(latLng.toString());
-            option.position(latLng);
-            Marker currentMarker = map.addMarker(option);
-            currentMarker.showInfoWindow();
-            currentMarker.setIcon(bitmapDescriptor);
-
+            mapView.putMarker(latLng);
         } else {
             LatLng latLng = new LatLng(60, 100);
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
@@ -227,11 +215,7 @@ public class MainActivity extends AppCompatActivity {
 
                     Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
 
-                    // Show current location on Map.
-                    // this.showMyLocation();
-                }
-                // Cancelled or denied.
-                else {
+                } else {
                     Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
                 }
                 break;
