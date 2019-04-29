@@ -5,4 +5,5 @@
     <color name="lightTheme">#f7ffffff</color>
     <color name="darkTheme">#52c4a6</color>
     <color name="colorAccent">#281bd8</color>
+    <color name="colorError">#fa0e2e</color>
 </resources>

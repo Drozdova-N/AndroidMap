@@ -1,10 +1,15 @@
 package com.example.dnina.navigator;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -13,12 +18,13 @@ import static android.support.v4.content.ContextCompat.getSystemService;
 public class LocationUser implements LocationListener {
 
     private String MYTAG = "LocationUser";
-    private  LocationManager locationManager;
+    private LocationManager locationManager;
+    private static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
-    public  LocationUser(LocationManager manager)
-    {
+    public LocationUser(LocationManager manager) {
         this.locationManager = manager;
     }
+
     public Location getLocation() {
 
         String locationProvider = getEnabledLocationProvider();
@@ -89,4 +95,6 @@ public class LocationUser implements LocationListener {
     public void onProviderDisabled(String provider) {
 
     }
+
+
 }

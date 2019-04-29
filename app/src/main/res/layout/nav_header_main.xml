@@ -16,19 +16,18 @@
         android:layout_margin="@dimen/margin"
         android:text="@string/pointA"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/origin"
+        app:layout_constraintEnd_toStartOf="@+id/origin"
         />
 
-    <EditText
+    <fragment
         android:id="@+id/origin"
         android:layout_width="0dp"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tv_start"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <TextView
@@ -39,55 +38,66 @@
         android:layout_marginTop="28dp"
         android:text="@string/pointB"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBaseline_toBaselineOf="@id/destination"
-        />
+        app:layout_constraintEnd_toStartOf="@id/destination"
+        app:layout_constraintTop_toBottomOf="@id/tv_start"/>
 
-    <EditText
+    <fragment
         android:id="@+id/destination"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/tv_finish"
-        app:layout_constraintTop_toBottomOf="@id/origin"/>
+        app:layout_constraintTop_toBottomOf="@id/origin" />
+
+    <TextView
+        android:id="@+id/tv_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+        android:textColor="@color/colorError"
+        android:text=""
+        android:textSize="@dimen/textError"
+        app:layout_constraintBottom_toTopOf="@id/btn_GO"
+        app:layout_constraintTop_toBottomOf="@id/tv_finish"/>
 
     <Button
         android:id="@+id/btn_GO"
         android:layout_width="60dp"
         android:layout_height="30dp"
+        android:layout_margin="@dimen/margin"
         android:background="@color/colorPrimaryDark"
         android:padding="5dp"
-        android:layout_margin="@dimen/margin"
         android:text="@string/btn_go"
         android:textColor="#fff"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/destination"/>
+        app:layout_constraintTop_toBottomOf="@id/destination" />
 
     <ImageView
         android:id="@+id/down_arrow"
         android:layout_width="60dp"
         android:layout_height="20dp"
+        android:layout_margin="@dimen/margin"
         android:background="@color/cast_expanded_controller_text_color"
         android:src="@drawable/down_arrow"
-        android:layout_margin="@dimen/margin"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_GO"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="visible"
-         />
+        app:layout_constraintTop_toBottomOf="@id/btn_GO" />
 
     <ImageView
         android:id="@+id/up_arrow"
         android:layout_width="60dp"
         android:layout_height="20dp"
+        android:layout_margin="@dimen/margin"
         android:background="@color/cast_expanded_controller_text_color"
         android:src="@drawable/up_arrow"
-        android:layout_margin="@dimen/margin"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_GO"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:visibility="invisible"
-        />
+        app:layout_constraintTop_toBottomOf="@id/btn_GO" />
 </android.support.constraint.ConstraintLayout>

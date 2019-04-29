@@ -2,10 +2,10 @@ package com.example.dnina.navigator;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,95 +15,100 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.maps.android.PolyUtil;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-import static java.lang.Long.decode;
 
 public class MainActivity extends AppCompatActivity {
 
-    private GoogleMap map;
+    private MapView map;
     private Button btnGO;
-    private EditText destination;
-    private EditText origin;
+    private AutocompleteSupportFragment destination;
+    private AutocompleteSupportFragment origin;
     private SlidingUpPanelLayout slidingPanel;
     private ImageView upArrow;
     private ImageView downArrow;
+    private TextView tv_error;
+
+    private  String originStr ;
+    private  String destinationStr;
 
 
     private static final String MYTAG = "MAIN_ACTIVITY";
     private static final int REQUEST_ID_ACCESS_COURSE_FINE_LOCATION = 100;
 
-
     private LocationUser locationUser;
     private Location currentLocation;
-    private String ssss = "59.999451,30.366708";
-    private MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        origin = findViewById(R.id.origin);
-        destination = findViewById(R.id.destination);
-        btnGO = findViewById(R.id.btn_GO);
-        slidingPanel = findViewById(R.id.sliding_layout);
-        upArrow = findViewById(R.id.up_arrow);
-        downArrow = findViewById(R.id.down_arrow);
-
-        destination.setText(ssss);
+        loadView();
 
         // отрисовка карты
         final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_View);
         mapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
-                map = googleMap;
-                mapView = new MapView(map);
+                map = new MapView(googleMap);
                 showLocationUser();
-                if (currentLocation != null) origin.setText(getLocationStr(currentLocation));
-
             }
         });
 
         btnGO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (origin.getText() != null && destination != null) {
-                    showRoute();
-                    slidingPanel.collapsePanel();
+                if (!originStr.equals("") && !destinationStr.equals("")) {
+                    showRoute(originStr, destinationStr);
+                    tv_error.setText("");
                 }
-                
+
             }
         });
 
 
+        origin.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+
+                originStr = place.getAddress();
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+
+            }
+        });
+
+        destination.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(@NonNull Place place) {
+                destinationStr = place.getAddress();
+
+            }
+
+            @Override
+            public void onError(@NonNull Status status) {
+
+            }
+        });
         slidingPanel.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View view, float v) {
@@ -132,11 +137,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void loadView() {
+        origin = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.origin);
+        destination = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.destination);
+        btnGO = findViewById(R.id.btn_GO);
+        slidingPanel = findViewById(R.id.sliding_layout);
+        upArrow = findViewById(R.id.up_arrow);
+        downArrow = findViewById(R.id.down_arrow);
+        tv_error = findViewById(R.id.tv_error);
+    }
+
     private String getLocationStr(Location ll) {
         return "" + ll.getLatitude() + "," + ll.getLongitude();
     }
 
-    private void showRoute(String origin , String destination) {
+    private void showRoute(String origin, String destination) {
 
         RouteRequest request = NetworkModule.getRouteRequest();
         Call<RouteResponse> call = request.getRout(origin,
@@ -145,15 +160,17 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<RouteResponse>() {
             @Override
             public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
-                RouteResponse route = response.body();
-                List<LatLng> listLL = PolyUtil.decode(route.getPoints());
-                mapView.drawRoute(listLL, getResources().getDisplayMetrics().widthPixels);
-
+                if (response.isSuccessful()) {
+                    slidingPanel.collapsePanel();
+                    RouteResponse route = response.body();
+                    List<LatLng> listLL = PolyUtil.decode(route.getPoints());
+                    map.drawRoute(listLL, getResources().getDisplayMetrics().widthPixels);
+                } else tv_error.setText("некорректные данные");
             }
 
             @Override
             public void onFailure(Call<RouteResponse> call, Throwable t) {
-
+                tv_error.setText("нет соединения:(");
             }
         });
 
@@ -167,10 +184,10 @@ public class MainActivity extends AppCompatActivity {
         if (currentLocation != null) {
 
             LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-            mapView.putMarker(latLng);
+            map.putMarker(latLng, true);
         } else {
             LatLng latLng = new LatLng(60, 100);
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 5));
+            map.putMarker(latLng, false);
             Toast.makeText(this, "Location not found!", Toast.LENGTH_LONG).show();
             Log.i(MYTAG, "Location not found");
         }
@@ -188,8 +205,7 @@ public class MainActivity extends AppCompatActivity {
             if (accessCoarsePermission != PackageManager.PERMISSION_GRANTED
                     || accessFinePermission != PackageManager.PERMISSION_GRANTED) {
                 // The Permissions to ask user.
-                String[] permissions = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.ACCESS_FINE_LOCATION};
+                String[] permissions = new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
                 // Show a dialog asking the user to allow the above permissions.
                 ActivityCompat.requestPermissions(this, permissions,
                         REQUEST_ID_ACCESS_COURSE_FINE_LOCATION);
@@ -214,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
                         && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
 
                     Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
+                    showLocationUser();
 
                 } else {
                     Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
