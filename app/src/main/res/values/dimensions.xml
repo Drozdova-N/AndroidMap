@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="margin">5dp</dimen>
+    <dimen name="textError">13sp</dimen>
+    <dimen name="sizeAB">22sp</dimen>
 </resources>
