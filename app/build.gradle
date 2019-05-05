@@ -28,6 +28,7 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.sothree.slidinguppanel:library:2.0.4'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
 
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'

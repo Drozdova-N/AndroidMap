@@ -19,9 +19,10 @@ import java.util.List;
 
 public class MapView {
 
-    private GoogleMap map;
-    private Marker markerStart;
-    private Marker markerFinish;
+    private static GoogleMap map;
+    private static Marker markerStart;
+    private static Marker markerFinish;
+    private static Marker myLocation;
 
 //    private static MarkerOptions start = new MarkerOptions();
 //    private static MarkerOptions finish = new MarkerOptions();
@@ -33,7 +34,7 @@ public class MapView {
         map = googleMap;
     }
 
-    public GoogleMap getMap() {
+    public static GoogleMap getMap() {
 
         return map;
     }
@@ -69,30 +70,39 @@ public class MapView {
         map.moveCamera(track);
     }
 
-    public void putMarker(LatLng ll, boolean myImage) {
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(ll, 15));
+    public static void putMarker(LatLng ll, boolean myImage) {
 
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(ll)             // Sets the center of the map to location user
-                .zoom(15)                   // Sets the zoom
-                .bearing(360)                // Sets the orientation of the camera to north
-                .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                .build();                   // Creates a CameraPosition from the builder
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        if (myLocation != null) myLocation.remove();
+        else {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(ll, 15));
 
-
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(ll)             // Sets the center of the map to location user
+                    .zoom(15)                   // Sets the zoom
+                    .bearing(360)                // Sets the orientation of the camera to north
+                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                    .build();                   // Creates a CameraPosition from the builder
+            map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
         // Add Marker to Map
         MarkerOptions option = new MarkerOptions();
         option.snippet(ll.toString());
         option.position(ll);
-        Marker currentMarker = map.addMarker(option);
+        myLocation = map.addMarker(option);
         if (myImage) {
             option.title("My Location");
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromResource(R.drawable.cat2);
-            currentMarker.setIcon(bitmapDescriptor);
+            myLocation.setIcon(bitmapDescriptor);
         }
-        currentMarker.showInfoWindow();
-
+        myLocation.showInfoWindow();
     }
 
+    public static void cleareMap() {
+
+        if (polylineFinal != null) polylineFinal.remove();
+        if (markerStart != null && markerFinish != null) {
+            markerStart.remove();
+            markerFinish.remove();
+        }
+    }
 }

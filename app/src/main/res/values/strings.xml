@@ -1,8 +1,16 @@
 <resources>
     <string name="app_name">Navigator</string>
-    <string name ="pointA">A: </string>
-    <string name ="pointB">B: </string>
+    <string name="pointA">A: </string>
+    <string name="pointB">B: </string>
     <string name="btn_go">GO</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="title_activity_menu_drawer">Меню</string>
+    <string name="nav_header_title">Navigator</string>
+    <string name="nav_header_subtitle">неавторизованный пользователь</string>
+    <string name="nav_header_desc">Navigation</string>
+    <string name="action_settings">Settings</string>
+    <string name="info_route">Время в пути </string>
+    <string name="info_distance">Расстояние </string>
+
 </resources>

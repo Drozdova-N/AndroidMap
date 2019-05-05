@@ -5,7 +5,7 @@ import retrofit2.http.Query;
 
 public interface RouteRequest {
 
-    @GET("maps/api/directions/json?key=AIzaSyBrKbH7sPHZP81OVGoTPEd9ZaxingYENiw")
+    @GET("maps/api/directions/json?key=AIzaSyBrKbH7sPHZP81OVGoTPEd9ZaxingYENiw&departure_time=now")
     Call<RouteResponse> getRout(@Query(value = "origin") String position,
                                 @Query(value = "destination") String destination,
                                 @Query("sensor") boolean sensor,

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom">
+
+    <TextView
+        android:id="@+id/tv_route"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_margin="@dimen/margin"
+        android:fontFamily="cursive"
+        android:textColor="@color/quantum_black_100"
+        android:textSize="@dimen/textSize"
+        android:textStyle="italic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="здесь будут точки а и б" />
+
+    <ImageView
+        android:id="@+id/save_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:src="@drawable/starfalse"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_route"
+        />
+
+    <TextView
+        android:id="@+id/tv_info_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:fontFamily="cursive"
+        android:text="@string/info_route"
+        android:textColor="@color/quantum_black_100"
+        android:textSize="@dimen/textSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_route" />
+
+    <TextView
+        android:id="@+id/duration_in_traffic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/textSize"
+        android:textStyle="italic"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_info_time"
+        app:layout_constraintStart_toEndOf="@id/tv_info_time"
+        app:layout_constraintTop_toBottomOf="@id/tv_route"
+        tools:text="1 час 45 минут" />
+
+    <TextView
+        android:id="@+id/tv_info_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:fontFamily="cursive"
+        android:text="@string/info_distance"
+        android:textColor="@color/quantum_black_100"
+        android:textSize="@dimen/textSize"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/duration_in_traffic" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/textSize"
+        android:textStyle="italic"
+        app:layout_constraintBaseline_toBaselineOf="@id/tv_info_distance"
+        app:layout_constraintStart_toEndOf="@id/tv_info_distance"
+        app:layout_constraintTop_toBottomOf="@id/duration_in_traffic"
+        tools:text="456 км" />
+</android.support.constraint.ConstraintLayout>

@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import static android.support.v4.content.ContextCompat.getSystemService;
 
 public class LocationUser implements LocationListener {
@@ -15,6 +17,7 @@ public class LocationUser implements LocationListener {
     private String MYTAG = "LocationUser";
     private  LocationManager locationManager;
 
+    private  static Location locationUser ;
     public  LocationUser(LocationManager manager)
     {
         this.locationManager = manager;
@@ -32,7 +35,7 @@ public class LocationUser implements LocationListener {
         // Met
         final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
 
-        Location locationUser = null;
+       // Location locationUser = null;
         try {
             // This code need permissions (Asked above ***)
             locationManager.requestLocationUpdates(
@@ -72,11 +75,13 @@ public class LocationUser implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        getLocation();
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+       MapView.putMarker(latLng, true);
     }
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+
 
     }
 

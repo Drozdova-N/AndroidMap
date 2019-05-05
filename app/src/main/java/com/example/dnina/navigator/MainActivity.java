@@ -6,11 +6,16 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
@@ -38,17 +43,25 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private MapView map;
     private Button btnGO;
     private SlidingUpPanelLayout slidingPanel;
     private ImageView upArrow;
     private ImageView downArrow;
+    private ImageView saveRoute;
+    private SlidingUpPanelLayout slidingLayoutInfo;
+    private TextView distance;
+    private TextView durationInTraffic;
+    private TextView tvRoute;
 
+    private boolean isSave = false;
 
-    private String originStr;
-    private String destinationStr;
+    private AutocompleteSupportFragment autocompleteFragmentA;
+    private AutocompleteSupportFragment autocompleteFragmentB;
+    private String originStr = "";
+    private String destinationStr = "";
 
 
     private static final String MYTAG = "MAIN_ACTIVITY";
@@ -60,7 +73,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_menu_drawer);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
         loadView();
 
         // отрисовка карты
@@ -73,23 +88,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (!Places.isInitialized()) {
-            Places.initialize(getApplicationContext(), "AIzaSyBrKbH7sPHZP81OVGoTPEd9ZaxingYENiw");
-
-        }
-
-        AutocompleteSupportFragment autocompleteFragmentA = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragmentA);
-        AutocompleteSupportFragment autocompleteFragmentB = (AutocompleteSupportFragment)
-                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragmentB);
-
-        assert autocompleteFragmentA != null;
-        autocompleteFragmentA.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
-
-        assert autocompleteFragmentB != null;
-        autocompleteFragmentB.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
-
-
         autocompleteFragmentA.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
@@ -99,11 +97,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull Status status) {
+                originStr = "";
 
             }
         });
-
-
         autocompleteFragmentB.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
@@ -112,16 +109,36 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(@NonNull Status status) {
+                destinationStr = "";
+            }
+        });
 
+
+        saveRoute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isSave) {
+                    saveRoute.setImageResource(R.drawable.starfalse);
+                    isSave = false;
+                }
+                else  {
+                    saveRoute.setImageResource(R.drawable.startrue);
+                    isSave = true;
+                }
             }
         });
 
         btnGO.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!originStr.equals("") && !destinationStr.equals("")) {
+                if (!(autocompleteFragmentA.a.getText().length() == 0) && !(autocompleteFragmentB.a.getText().length() == 0)) {
                     showRoute(originStr, destinationStr);
-                }else  Toast.makeText(MainActivity.this , "введите адресс" , Toast.LENGTH_LONG);
+                } else {
+                    Toast.makeText(MainActivity.this, "введите адресс", Toast.LENGTH_LONG);
+                    MapView.cleareMap();
+                    slidingLayoutInfo.collapsePanel();
+                    slidingLayoutInfo.hidePanel();
+                }
             }
         });
 
@@ -160,14 +177,33 @@ public class MainActivity extends AppCompatActivity {
         slidingPanel = findViewById(R.id.sliding_layout);
         upArrow = findViewById(R.id.up_arrow);
         downArrow = findViewById(R.id.down_arrow);
+        durationInTraffic = findViewById(R.id.duration_in_traffic);
+        distance = findViewById(R.id.distance);
+        slidingLayoutInfo = findViewById(R.id.sliding_layout_info);
+        slidingLayoutInfo.hidePanel();
+        saveRoute = findViewById(R.id.save_route);
+        tvRoute = findViewById(R.id.tv_route);
+        if (!Places.isInitialized()) {
+            Places.initialize(getApplicationContext(), "AIzaSyBrKbH7sPHZP81OVGoTPEd9ZaxingYENiw");
+        }
+
+        autocompleteFragmentA = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragmentA);
+        autocompleteFragmentB = (AutocompleteSupportFragment)
+                getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragmentB);
+
+        autocompleteFragmentA.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+
+        autocompleteFragmentB.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
 
     }
+
 
     private String getLocationStr(Location ll) {
         return "" + ll.getLatitude() + "," + ll.getLongitude();
     }
 
-    private void showRoute(String origin, String destination) {
+    private void showRoute(final String origin, String destination) {
 
 
         RouteRequest request = NetworkModule.getRouteRequest();
@@ -182,13 +218,20 @@ public class MainActivity extends AppCompatActivity {
                     RouteResponse route = response.body();
                     List<LatLng> listLL = PolyUtil.decode(route.getPoints());
                     map.drawRoute(listLL, getResources().getDisplayMetrics().widthPixels);
-                } else Toast.makeText(MainActivity.this, "некорректные данные",  Toast.LENGTH_LONG).show();
+                    distance.setText(route.getDistance());
+                    durationInTraffic.setText(route.getTravelTime());
+                    tvRoute.setText("" + originStr + " - " + destinationStr);
+                    slidingLayoutInfo.showPanel();
+                    slidingLayoutInfo.expandPanel();
+
+                } else
+                    Toast.makeText(MainActivity.this, "некорректные данные", Toast.LENGTH_LONG).show();
 
             }
 
             @Override
             public void onFailure(Call<RouteResponse> call, Throwable t) {
-                Toast.makeText(MainActivity.this, "нет соединения:(",  Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "нет соединения:(", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -256,5 +299,36 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_route) {
+            ListMyRoute.start(this);
+        } else if (id == R.id.nav_place) {
+            ListMyPlace.start(this);
+
+        } else if (id == R.id.nav_history) {
+
+        } else if (id == R.id.nav_manage) {
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

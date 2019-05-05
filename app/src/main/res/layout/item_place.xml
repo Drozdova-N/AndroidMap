@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_place"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/list">
+
+<ImageView
+        android:id="@+id/photo_place"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_list"
+        tools:src="@drawable/place" />
+
+    <TextView
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_list"
+        tools:text="г.Санкт-Петербург Институтский проспект д.9 лит В"
+        android:textSize="@dimen/sizeAB"/>
+
+    <ImageView
+        android:id="@+id/save_route"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_list"
+        android:src="@drawable/startrue"
+        />
+</LinearLayout>

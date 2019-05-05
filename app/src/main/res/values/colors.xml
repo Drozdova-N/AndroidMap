@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="lightTheme">#f7ffffff</color>
     <color name="darkTheme">#52c4a6</color>
-    <color name="colorAccent">#281bd8</color>
+    <color name="colorAccent">#1b138b</color>
+    <color name="list">#b4b1e9e0</color>
 </resources>

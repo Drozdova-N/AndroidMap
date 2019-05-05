@@ -6,7 +6,9 @@
     android:layout_height="wrap_content"
     android:background="@color/lightTheme"
     android:orientation="horizontal"
-    android:visibility="visible">
+    android:visibility="visible"
+    android:layout_gravity="top"
+    >
 
     <LinearLayout
         android:id="@+id/ll1"
