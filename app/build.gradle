@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 
+apply plugin: 'com.google.gms.google-services'
+
+
 
 android {
     compileSdkVersion 28
@@ -34,11 +37,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
 
 
-    implementation 'com.google.maps.android:android-maps-utils:0.3+'
+    implementation 'com.google.maps.android:android-maps-utils:0.3.4'
+    implementation 'com.google.android.gms:play-services-places:16.1.0'
+    implementation 'com.google.android.libraries.places:places:1.1.0'
 
+    implementation 'com.google.firebase:firebase-core:16.0.9'
+    implementation 'com.google.firebase:firebase-auth:17.0.0'
+    implementation 'com.firebaseui:firebase-ui-database:1.2.0'
 
-    implementation 'com.google.android.gms:play-services-places:16.0.0'
-    implementation 'com.google.android.libraries.places:places:1.0.0'
 
 
     testImplementation 'junit:junit:4.12'
@@ -46,4 +52,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
 
+
+    implementation 'com.google.firebase:firebase-database:17.0.0'
 }

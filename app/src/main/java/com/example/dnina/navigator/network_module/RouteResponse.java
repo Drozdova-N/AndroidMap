@@ -1,20 +1,24 @@
-package com.example.dnina.navigator;
+package com.example.dnina.navigator.network_module;
 
 import java.util.List;
 
 public class RouteResponse {
     List<Route> routes;
 
-    public String getPoints() {
-        return this.routes.get(0).overview_polyline.points;
+    public String getPoints(int i) {
+        return this.routes.get(i).overview_polyline.points;
     }
 
-    public String getTravelTime() {
-        return this.routes.get(0).legs.get(0).duration_in_traffic.text;
+    public String getTravelTime(int i) {
+        return this.routes.get(i).legs.get(0).duration_in_traffic.text;
     }
 
-    public String getDistance() {
-        return this.routes.get(0).legs.get(0).distance.text;
+    public int size() {
+        return routes.size();
+    }
+
+    public String getDistance(int i) {
+        return this.routes.get(i).legs.get(0).distance.text;
     }
 
     class Route {

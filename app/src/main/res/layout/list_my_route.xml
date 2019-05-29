@@ -1,10 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recycler_view_route"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    tools:context=".ListMyRoute">
+    android:orientation="vertical"
+    android:background="@color/quantum_white_100">
 
-</android.support.v7.widget.RecyclerView>
+    <TextView
+        android:id="@+id/is_not_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_list"
+        android:textSize="@dimen/sizeAB"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:text="здесь пока нет записей"
+        android:background="@color/quantum_white_100"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_route"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:scrollbars="vertical"
+        tools:context=".activity.ListMyRoute"></android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

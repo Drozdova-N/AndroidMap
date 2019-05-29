@@ -1,4 +1,6 @@
-package com.example.dnina.navigator;
+package com.example.dnina.navigator.network_module;
+
+import com.example.dnina.navigator.network_module.RouteRequest;
 
 import java.util.concurrent.TimeUnit;
 
